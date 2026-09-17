@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Locate,
   Mountain,
@@ -12,9 +13,10 @@ import {
   Waves,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { StabilitySheet } from "@/components/sim/stability-sheet";
 import { cn } from "@/lib/cn";
 import { MAX_MU, MIN_MU, ROUTH_MU } from "@/lib/sim/cr3bp";
-import { MISSIONS, missionById } from "@/lib/sim/missions";
+import { groupedMissions, missionById } from "@/lib/sim/missions";
 import { POINT_COPY, SYSTEMS, systemById } from "@/lib/sim/systems";
 import type { OrbitKind, MissionStatus } from "@/lib/sim/missions";
 import type { EngineApi, HudSnapshot, PointId } from "@/lib/sim/types";
@@ -27,6 +29,7 @@ type Props = {
 const POINTS: PointId[] = ["L1", "L2", "L3", "L4", "L5"];
 
 export function Hud({ hud, engine }: Props) {
+  const [essay, setEssay] = useState(false);
   const sys = systemById(hud.system);
   const mission = hud.selectedMission ? missionById(hud.selectedMission) : undefined;
   const copy = hud.selected ? POINT_COPY[hud.selected] : null;
@@ -34,6 +37,7 @@ export function Hud({ hud, engine }: Props) {
   const logMax = Math.log10(MAX_MU);
   const logVal = (Math.log10(hud.mu) - logMin) / (logMax - logMin);
   const routhT = (Math.log10(ROUTH_MU) - logMin) / (logMax - logMin);
+  const showDossier = !essay && (mission || copy);
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-5">
@@ -42,30 +46,43 @@ export function Hud({ hud, engine }: Props) {
           <p className="font-display text-3xl leading-none tracking-tight text-fg">
             Libration
           </p>
-          <p className="mt-1 max-w-[18rem] text-xs text-muted text-pretty sm:text-sm">
-            Missions at the five quiet points
+          <p className="mt-1 max-w-xs text-xs text-muted text-pretty sm:text-sm">
+            Fourteen spacecraft at the five quiet points
           </p>
+          <button
+            type="button"
+            className="pointer-events-auto mt-1 min-h-11 font-display italic text-sm text-fg/85 transition-colors duration-[var(--motion-quick)] ease-[var(--ease-out)] hover:text-fg"
+            onClick={() => setEssay(true)}
+            aria-expanded={essay}
+            aria-controls="stability-title"
+          >
+            On stability
+          </button>
           {hud.hint ? (
-            <p className="mt-2 hidden max-w-[22rem] text-xs text-muted animate-hint sm:block sm:text-sm">
-              JWST orbits L2; SOHO holds L1. Pick a mission, or drag to throw a probe.
+            <p className="mt-2 hidden max-w-md text-xs text-muted animate-hint sm:block sm:text-sm">
+              Collinear saddles fall. Triangular hilltops can hold. Open the essay, or pick a craft.
             </p>
           ) : null}
         </div>
         <div className="pointer-events-auto flex flex-col items-end gap-2">
           <div className="flex items-center gap-2">
-            <Stat label="Probes" value={String(hud.probeCount)} />
+            <Stat label="Fleet" value={String(hud.probeCount)} />
             <Stat label="μ" value={formatMu(hud.mu)} />
           </div>
-          <span
+          <button
+            type="button"
+            onClick={() => setEssay(true)}
+            aria-expanded={essay}
             className={cn(
-              "rounded-full border px-2.5 py-1 text-xs font-medium tracking-wide",
+              "min-h-11 rounded-full border px-3 text-xs font-medium tracking-wide",
+              "transition-colors duration-[var(--motion-quick)] ease-[var(--ease-out)]",
               hud.stable
-                ? "border-border bg-surface/80 text-fg"
-                : "border-border bg-elevated/80 text-muted",
+                ? "border-border bg-surface/80 text-fg hover:border-border-strong"
+                : "border-border bg-elevated/80 text-muted hover:text-fg",
             )}
           >
             {hud.stable ? "L4 / L5 stable" : "Trojans unbound"}
-          </span>
+          </button>
         </div>
       </header>
 
@@ -85,25 +102,47 @@ export function Hud({ hud, engine }: Props) {
                 </Button>
               ))}
             </div>
-            <div className="pointer-events-auto mt-2 flex max-w-[min(100%,42rem)] gap-1 overflow-x-auto pb-1">
-              {MISSIONS.map((m) => (
-                <Button
-                  key={m.id}
-                  size="sm"
-                  variant={hud.selectedMission === m.id ? "solid" : "outline"}
-                  className="h-11 shrink-0 rounded-full px-3 text-xs"
-                  onClick={() => engine?.loadMission(m.id)}
-                >
-                  {m.name}
-                </Button>
+            <div className="pointer-events-auto mt-2 flex max-w-[min(100%,44rem)] gap-3 scroll-x pb-1">
+              {groupedMissions().map((g) => (
+                <div key={g.point} className="flex shrink-0 items-center gap-1">
+                  <span className="px-1 font-mono text-xs text-muted">{g.point}</span>
+                  {g.missions.map((m) => (
+                    <Button
+                      key={m.id}
+                      size="sm"
+                      variant={
+                        hud.selectedMission === m.id
+                          ? "solid"
+                          : m.system === hud.system
+                            ? "outline"
+                            : "ghost"
+                      }
+                      className="h-11 shrink-0 rounded-full px-3 text-xs"
+                      onClick={() => engine?.loadMission(m.id)}
+                    >
+                      <span
+                        className={cn(
+                          "size-1.5 rounded-full",
+                          m.status === "active"
+                            ? "bg-fg"
+                            : m.status === "en-route"
+                              ? "bg-accent"
+                              : "bg-muted",
+                        )}
+                        aria-hidden
+                      />
+                      {m.name}
+                    </Button>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
-          {mission || copy ? (
+          {showDossier ? (
             <aside
               className={cn(
-                "pointer-events-none hidden max-w-[18rem] rounded-[20px] border border-border",
-                "bg-surface/80 p-4 shadow-[0_16px_60px_rgba(0,0,0,0.35)] lg:block",
+                "pointer-events-none hidden max-w-xs rounded-xl border border-border",
+                "bg-surface/80 p-4 shadow-[0_16px_60px_rgba(0,0,0,0.35)] md:block",
               )}
             >
               {mission ? (
@@ -135,20 +174,23 @@ export function Hud({ hud, engine }: Props) {
 
         <section
           className={cn(
-            "pointer-events-auto mt-auto w-full max-w-3xl shrink-0 self-start rounded-[24px] border border-border",
-            "bg-surface/85 p-2.5 shadow-[0_16px_60px_rgba(0,0,0,0.35)] sm:rounded-[28px] sm:p-4",
+            "pointer-events-auto mt-auto w-full max-w-3xl shrink-0 self-start rounded-xl border border-border",
+            "bg-surface/85 p-2.5 shadow-[0_16px_60px_rgba(0,0,0,0.35)] sm:rounded-xl sm:p-4",
           )}
         >
           {mission ? (
-            <p className="mb-2 truncate px-1 text-xs text-muted lg:hidden">
-              <span className="font-mono text-fg">{mission.name}</span>
-              <span>
-                {" "}
-                · {mission.point} · {orbitLabel(mission.orbit)}
-              </span>
-            </p>
+            <div className="mb-2 px-1 md:hidden">
+              <p className="truncate text-xs text-muted">
+                <span className="font-mono text-fg">{mission.name}</span>
+                <span>
+                  {" "}
+                  · {mission.point} · {orbitLabel(mission.orbit)}
+                </span>
+              </p>
+              <p className="truncate text-xs text-muted">{mission.why}</p>
+            </div>
           ) : copy ? (
-            <p className="mb-2 truncate px-1 text-xs text-muted lg:hidden">
+            <p className="mb-2 truncate px-1 text-xs text-muted md:hidden">
               <span className="font-mono text-fg">{copy.id}</span>
               <span> · {copy.title}</span>
             </p>
@@ -198,9 +240,14 @@ export function Hud({ hud, engine }: Props) {
             <label className="flex min-w-0 flex-1 flex-col gap-1">
               <span className="flex items-center justify-between text-xs uppercase tracking-wider text-muted">
                 Mass ratio μ
-                <span className="font-mono normal-case tabular-nums text-fg/80">
+                <button
+                  type="button"
+                  className="font-mono normal-case tabular-nums text-fg/80 hover:text-fg"
+                  onClick={() => setEssay(true)}
+                >
                   {formatMu(hud.mu)}
-                </span>
+                  <span className="hidden sm:inline"> · μ_R {ROUTH_MU.toFixed(4)}</span>
+                </button>
               </span>
               <div className="relative">
                 <span
@@ -334,6 +381,15 @@ export function Hud({ hud, engine }: Props) {
           </div>
         </section>
       </div>
+      {essay ? (
+        <button
+          type="button"
+          className="pointer-events-auto absolute inset-0 z-20 bg-bg/70 md:hidden"
+          aria-label="Dismiss stability essay"
+          onClick={() => setEssay(false)}
+        />
+      ) : null}
+      <StabilitySheet open={essay} onClose={() => setEssay(false)} hud={hud} engine={engine} />
     </div>
   );
 }

@@ -1,9 +1,11 @@
 import { omega, primaryPos, rotate, secondaryPos } from "./cr3bp";
+import { missionById } from "./missions";
 import type { SystemDef } from "./systems";
 import type {
   Camera,
   FlingState,
   Frame,
+  Halo,
   LagrangePoint,
   Particle,
   PointId,
@@ -287,6 +289,7 @@ export function drawFrame(opts: {
   frame: Frame;
   theta: number;
   selected: PointId | null;
+  selectedMission: string | null;
   now: number;
   reduced: boolean;
 }) {
@@ -341,6 +344,7 @@ export function drawFrame(opts: {
   }
 
   drawGeometry(ctx, opts);
+  drawHaloGhosts(ctx, opts);
   if (opts.trails) drawTrails(ctx, opts.probes, opts.frame, opts.theta, cam.zoom);
   if (opts.predict) drawPredict(ctx, opts.predict, opts.frame, opts.theta);
   drawBodies(ctx, opts);
@@ -399,6 +403,47 @@ function drawGeometry(
   ctx.beginPath();
   ctx.arc(0, 0, 3 * lw, 0, Math.PI * 2);
   ctx.fill();
+}
+
+function haloPeriod(h: Halo) {
+  const r = h.w === 0 ? 1 : h.wy / h.w;
+  if (Math.abs(r - 2 / 3) < 0.08) return (Math.PI * 6) / Math.max(h.w, 1e-6);
+  return (Math.PI * 2) / Math.max(h.w, 1e-6);
+}
+
+function drawHaloGhosts(
+  ctx: CanvasRenderingContext2D,
+  opts: {
+    probes: Probe[];
+    selectedMission: string | null;
+    frame: Frame;
+    theta: number;
+    cam: Camera;
+  },
+) {
+  const lw = 1.1 / opts.cam.zoom;
+  for (let i = 0; i < opts.probes.length; i++) {
+    const pr = opts.probes[i];
+    if (!pr.halo) continue;
+    const selected = pr.missionId === opts.selectedMission;
+    const h = pr.halo;
+    const period = haloPeriod(h);
+    const n = selected ? 160 : 96;
+    ctx.beginPath();
+    for (let k = 0; k <= n; k++) {
+      const t = (k / n) * period;
+      const x = h.lx + h.ax * Math.cos(h.w * t + h.phase);
+      const y = h.ly + h.ay * Math.sin(h.wy * t + h.phase);
+      const p = xf(x, y, opts.theta, opts.frame);
+      if (k === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.strokeStyle = selected ? "rgba(185,196,204,0.7)" : "rgba(185,196,204,0.18)";
+    ctx.lineWidth = selected ? lw * 1.35 : lw;
+    ctx.setLineDash(selected ? [5 * lw, 6 * lw] : [3 * lw, 7 * lw]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
 }
 
 function drawBodies(
@@ -553,23 +598,34 @@ function drawTrails(
       if (k === 0) ctx.moveTo(p.x, p.y);
       else ctx.lineTo(p.x, p.y);
     }
-    ctx.strokeStyle = "rgba(236,232,225,0.38)";
+    ctx.strokeStyle = pr.missionId
+      ? "rgba(236,232,225,0.28)"
+      : "rgba(236,232,225,0.38)";
     ctx.stroke();
   }
 }
 
 function drawProbes(
   ctx: CanvasRenderingContext2D,
-  opts: { probes: Probe[]; frame: Frame; theta: number; cam: Camera },
+  opts: {
+    probes: Probe[];
+    frame: Frame;
+    theta: number;
+    cam: Camera;
+    selectedMission: string | null;
+  },
 ) {
   const r = 3.2 / opts.cam.zoom;
   for (let i = 0; i < opts.probes.length; i++) {
     const pr = opts.probes[i];
     const p = xf(pr.x, pr.y, opts.theta, opts.frame);
     const craft = Boolean(pr.label);
-    const rad = r * (craft ? 1.35 : 1) * (1 + pr.flash * 0.8);
+    const selected = pr.missionId === opts.selectedMission;
+    const status = pr.missionId ? missionById(pr.missionId)?.status : undefined;
+    const dim = status === "complete" || status === "planned";
+    const rad = r * (craft ? 1.35 : 1) * (selected ? 1.35 : 1) * (1 + pr.flash * 0.8);
     ctx.fillStyle = PAPER;
-    ctx.globalAlpha = 0.95;
+    ctx.globalAlpha = dim && !selected ? 0.55 : 0.95;
     if (craft) {
       ctx.save();
       ctx.translate(p.x, p.y);
@@ -581,10 +637,18 @@ function drawProbes(
       ctx.arc(p.x, p.y, rad, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.globalAlpha = 0.25;
+    ctx.globalAlpha = selected ? 0.4 : 0.22;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, rad * 2.4, 0, Math.PI * 2);
+    ctx.arc(p.x, p.y, rad * (selected ? 3.1 : 2.4), 0, Math.PI * 2);
     ctx.fill();
+    if (selected) {
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = PAPER;
+      ctx.lineWidth = 1.2 / opts.cam.zoom;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, rad * 2.2, 0, Math.PI * 2);
+      ctx.stroke();
+    }
     ctx.globalAlpha = 1;
   }
 }
@@ -598,22 +662,73 @@ function drawCraftLabels(
     probes: Probe[];
     frame: Frame;
     theta: number;
+    selectedMission: string | null;
   },
 ) {
   const camT: Camera = {
     ...opts.cam,
     ...xf(opts.cam.x, opts.cam.y, opts.theta, opts.frame),
   };
-  ctx.font = "500 11px 'IBM Plex Sans', sans-serif";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
+  type Item = {
+    label: string;
+    x: number;
+    y: number;
+    selected: boolean;
+    dim: boolean;
+    tw: number;
+  };
+  const raw: Item[] = [];
   for (let i = 0; i < opts.probes.length; i++) {
     const pr = opts.probes[i];
     if (!pr.label) continue;
     const p = xf(pr.x, pr.y, opts.theta, opts.frame);
     const s = worldToScreen(p.x, p.y, camT, opts.w, opts.h);
-    ctx.fillStyle = PAPER;
-    ctx.fillText(pr.label, s.x + 10, s.y - 1);
+    const status = pr.missionId ? missionById(pr.missionId)?.status : undefined;
+    const selected = pr.missionId === opts.selectedMission;
+    ctx.font = selected
+      ? "500 12px 'IBM Plex Sans', sans-serif"
+      : "500 11px 'IBM Plex Sans', sans-serif";
+    raw.push({
+      label: pr.label,
+      x: s.x + 10,
+      y: s.y - 1,
+      selected,
+      dim: status === "complete" || status === "planned",
+      tw: ctx.measureText(pr.label).width,
+    });
+  }
+  raw.sort((a, b) => Number(b.selected) - Number(a.selected));
+  const placed: Item[] = [];
+  const hits = (a: Item, b: Item) => {
+    const ax1 = a.x + a.tw + (a.selected ? 14 : 0);
+    const bx1 = b.x + b.tw + (b.selected ? 14 : 0);
+    return a.x < bx1 + 8 && b.x < ax1 + 8 && Math.abs(a.y - b.y) < 15;
+  };
+  for (const it of raw) {
+    if (it.selected) {
+      placed.push(it);
+      continue;
+    }
+    if (placed.some((p) => hits(it, p))) continue;
+    placed.push(it);
+  }
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  for (const it of placed) {
+    ctx.font = it.selected
+      ? "500 12px 'IBM Plex Sans', sans-serif"
+      : "500 11px 'IBM Plex Sans', sans-serif";
+    if (it.selected) {
+      ctx.fillStyle = "rgba(8,9,12,0.78)";
+      ctx.beginPath();
+      ctx.roundRect(it.x - 1, it.y - 8, it.tw + 14, 16, 6);
+      ctx.fill();
+      ctx.fillStyle = PAPER;
+      ctx.fillText(it.label, it.x + 6, it.y);
+    } else {
+      ctx.fillStyle = it.dim ? "rgba(236,232,225,0.45)" : PAPER_DIM;
+      ctx.fillText(it.label, it.x, it.y);
+    }
   }
 }
 

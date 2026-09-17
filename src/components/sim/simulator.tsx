@@ -14,7 +14,7 @@ const INITIAL: HudSnapshot = {
   system: "sun-earth",
   mu: 3.0034e-6,
   stable: true,
-  probeCount: 0,
+  probeCount: 10,
   selected: "L2",
   selectedMission: "jwst",
   jacobi: null,

@@ -35,6 +35,7 @@ import type {
   Particle,
   PointId,
   Probe,
+  StabilityLessonId,
   SystemId,
 } from "./types";
 
@@ -320,6 +321,7 @@ export function createEngine(
   function seedDemo() {
     probes = [];
     nextProbeId = 1;
+    simTime = 0;
     const list = missionsForSystem(systemId);
     for (const m of list) spawnMissionCraft(m.id, true);
     if (list.length === 0) {
@@ -397,7 +399,10 @@ export function createEngine(
       }
       const r1 = Math.hypot(pr.x - prim.x, pr.y - prim.y);
       const r2 = Math.hypot(pr.x - sec.x, pr.y - sec.y);
-      if (r1 < sys.primaryR * 0.82 || r2 < sys.secondaryR * 0.82 || pr.x * pr.x + pr.y * pr.y > 25) {
+      if (
+        !pr.keep &&
+        (r1 < sys.primaryR * 0.82 || r2 < sys.secondaryR * 0.82 || pr.x * pr.x + pr.y * pr.y > 25)
+      ) {
         burst(pr.x, pr.y);
         audio.absorb();
         probes.splice(i, 1);
@@ -783,6 +788,71 @@ export function createEngine(
     hudDirty = true;
   }
 
+  function seedTrojans() {
+    const l4 = points.L4;
+    for (let i = 0; i < 9; i++) {
+      const ang = (Math.PI * 2 * i) / 9;
+      const rad = 0.04 + (i % 3) * 0.018;
+      spawnProbe(
+        l4.x + Math.cos(ang) * rad,
+        l4.y + Math.sin(ang) * rad,
+        (Math.random() - 0.5) * 0.01,
+        (Math.random() - 0.5) * 0.01,
+        true,
+      );
+    }
+    audio.drop();
+    selected = "L4";
+    hudDirty = true;
+  }
+
+  function playLesson(id: StabilityLessonId) {
+    paused = false;
+    trails = true;
+    hint = false;
+    hills = false;
+    if (id === "trojans") {
+      applySystem("sun-jupiter");
+      seedTrojans();
+      potential = false;
+      frame = "rotating";
+      selected = "L4";
+      selectedMission = "lucy";
+      fitCamera(true);
+    } else if (id === "routh") {
+      applySystem("equal");
+      probes = [];
+      particles.length = 0;
+      dropAt("L4", 0.028);
+      dropAt("L5", 0.028);
+      potential = false;
+      frame = "rotating";
+      selected = "L4";
+      selectedMission = null;
+      fitCamera(true);
+    } else if (id === "tadpole") {
+      applySystem("earth-moon");
+      probes = [];
+      particles.length = 0;
+      dropAt("L4", 0.01);
+      perturbAll();
+      potential = false;
+      frame = "rotating";
+      selected = "L4";
+      selectedMission = null;
+      fitCamera(true);
+    } else if (id === "saddle") {
+      if (systemId !== "sun-earth") applySystem("sun-earth");
+      loadMission("jwst");
+      potential = true;
+      frame = "rotating";
+    } else {
+      frame = "inertial";
+    }
+    persist();
+    hudDirty = true;
+  }
+
   function applySystem(id: SystemId, keepMu = false) {
     systemId = id;
     if (!keepMu) mu = systemById(id).mu;
@@ -888,21 +958,7 @@ export function createEngine(
     loadMission,
     selectMission,
     dropTrojans() {
-      const l4 = points.L4;
-      for (let i = 0; i < 9; i++) {
-        const ang = (Math.PI * 2 * i) / 9;
-        const rad = 0.04 + (i % 3) * 0.018;
-        spawnProbe(
-          l4.x + Math.cos(ang) * rad,
-          l4.y + Math.sin(ang) * rad,
-          (Math.random() - 0.5) * 0.01,
-          (Math.random() - 0.5) * 0.01,
-          true,
-        );
-      }
-      audio.drop();
-      selected = "L4";
-      hudDirty = true;
+      seedTrojans();
     },
     perturb: perturbAll,
     clear() {
@@ -915,6 +971,7 @@ export function createEngine(
       fitCamera(true);
     },
     focus: focusPoint,
+    playLesson,
     snapshot,
   };
 

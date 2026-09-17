@@ -66,10 +66,39 @@
   animation: hint-in var(--motion-slow) var(--ease-smooth-out) both;
 }
 
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-sheet {
+  animation: sheet-in var(--motion-slow) var(--ease-smooth-out) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-hint {
+  .animate-hint,
+  .animate-sheet {
     animation: none;
   }
+}
+
+.scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-x::-webkit-scrollbar {
+  display: none;
 }
 
 input[type="range"] {

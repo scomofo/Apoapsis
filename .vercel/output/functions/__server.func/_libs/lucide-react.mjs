@@ -344,5 +344,18 @@ var Waves = createLucideIcon("waves", [
 		key: "rd2r6e"
 	}]
 ]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var X = createLucideIcon("x", [["path", {
+	d: "M18 6 6 18",
+	key: "1bl5f8"
+}], ["path", {
+	d: "m6 6 12 12",
+	key: "d8bk6v"
+}]]);
 //#endregion
-export { Trash2 as a, RotateCcw as c, Mountain as d, Locate as f, TriangleAlert as i, Play as l, VolumeX as n, Spline as o, Volume2 as r, Shuffle as s, Waves as t, Pause as u };
+export { TriangleAlert as a, Shuffle as c, Pause as d, Mountain as f, Volume2 as i, RotateCcw as l, Waves as n, Trash2 as o, Locate as p, VolumeX as r, Spline as s, X as t, Play as u };

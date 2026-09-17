@@ -4,6 +4,13 @@ export type Frame = "rotating" | "inertial";
 
 export type SystemId = "earth-moon" | "sun-earth" | "sun-jupiter" | "equal";
 
+export type StabilityLessonId =
+  | "trojans"
+  | "routh"
+  | "tadpole"
+  | "saddle"
+  | "inertial";
+
 export type Vec2 = { x: number; y: number };
 
 export type LagrangePoint = {
@@ -109,5 +116,6 @@ export type EngineApi = {
   clear: () => void;
   fit: () => void;
   focus: (id: PointId) => void;
+  playLesson: (id: StabilityLessonId) => void;
   snapshot: () => HudSnapshot;
 };
