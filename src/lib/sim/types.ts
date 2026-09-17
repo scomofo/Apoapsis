@@ -1,30 +1,48 @@
-export type Kind = "dust" | "moon" | "world" | "giant" | "star" | "well";
+export type PointId = "L1" | "L2" | "L3" | "L4" | "L5";
 
-export type ScenarioId = "system" | "binary" | "figure8" | "slingshot" | "empty";
+export type Frame = "rotating" | "inertial";
 
-export type Body = {
+export type SystemId = "earth-moon" | "sun-earth" | "sun-jupiter" | "equal";
+
+export type Vec2 = { x: number; y: number };
+
+export type LagrangePoint = {
+  id: PointId;
+  x: number;
+  y: number;
+  omega: number;
+  collinear: boolean;
+  stable: boolean;
+};
+
+export type Halo = {
+  lx: number;
+  ly: number;
+  ax: number;
+  ay: number;
+  w: number;
+  wy: number;
+  phase: number;
+};
+
+export type Probe = {
   id: number;
   x: number;
   y: number;
-  px: number;
-  py: number;
   vx: number;
   vy: number;
-  ax: number;
-  ay: number;
-  mass: number;
-  radius: number;
-  kind: Kind;
-  hue: number;
-  fill: string;
-  glow: string;
   trail: Float32Array;
   trailCount: number;
   trailHead: number;
   lastTrailX: number;
   lastTrailY: number;
+  jacobi: number;
   flash: number;
-  born: number;
+  hue: number;
+  label: string | null;
+  missionId: string | null;
+  keep: boolean;
+  halo: Halo | null;
 };
 
 export type Particle = {
@@ -35,7 +53,6 @@ export type Particle = {
   life: number;
   maxLife: number;
   size: number;
-  hue: number;
 };
 
 export type Camera = {
@@ -54,36 +71,43 @@ export type FlingState = {
 };
 
 export type HudSnapshot = {
-  count: number;
-  merges: number;
   paused: boolean;
   timeScale: number;
+  frame: Frame;
+  potential: boolean;
+  hills: boolean;
   trails: boolean;
-  track: boolean;
   mute: boolean;
-  preset: Kind;
-  scenario: ScenarioId;
+  system: SystemId;
+  mu: number;
+  stable: boolean;
+  probeCount: number;
+  selected: PointId | null;
+  selectedMission: string | null;
+  jacobi: number | null;
   hint: boolean;
+  simDays: number;
 };
 
 export type EngineApi = {
   start: () => void;
   destroy: () => void;
-  setPreset: (kind: Kind) => void;
   setPaused: (paused: boolean) => void;
   setTimeScale: (scale: number) => void;
+  setFrame: (frame: Frame) => void;
+  setPotential: (on: boolean) => void;
+  setHills: (on: boolean) => void;
   setTrails: (on: boolean) => void;
-  setTrack: (on: boolean) => void;
   setMute: (on: boolean) => void;
+  setSystem: (id: SystemId) => void;
+  setMu: (mu: number) => void;
+  dropAt: (id: PointId, kick?: number) => void;
+  loadMission: (id: string) => void;
+  selectMission: (id: string) => void;
+  dropTrojans: () => void;
+  perturb: () => void;
   clear: () => void;
-  loadScenario: (id: ScenarioId) => void;
   fit: () => void;
-  spawn: (opts: {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    kind?: Kind;
-  }) => void;
+  focus: (id: PointId) => void;
   snapshot: () => HudSnapshot;
 };

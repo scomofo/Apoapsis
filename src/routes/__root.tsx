@@ -3,7 +3,7 @@ import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import appCss from "../styles.css?url";
 
-const APP_NAME = "Apoapsis";
+const APP_NAME = "Libration";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -11,8 +11,12 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: APP_NAME },
-      { name: "description", content: "Click-drag to fling planets and watch them orbit, slingshot, and collide." },
-      { name: "theme-color", content: "#07080c" },
+      {
+        name: "description",
+        content:
+          "Explore real Lagrange-point missions — JWST, SOHO, Gaia, Queqiao, Lucy — and watch them hold halo orbits around L1–L5.",
+      },
+      { name: "theme-color", content: "#08090c" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -23,7 +27,7 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap",
       },
     ],
   }),

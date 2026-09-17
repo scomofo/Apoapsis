@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+@font-face { font-family: "Instrument Serif"; src: url("file:///workspace/.grok/brand/InstrumentSerif-Regular.ttf") format("truetype"); font-style: normal; font-weight: 400; }
+@font-face { font-family: "Instrument Serif"; src: url("file:///workspace/.grok/brand/InstrumentSerif-Italic.ttf") format("truetype"); font-style: italic; font-weight: 400; }
+html, body { margin: 0; padding: 0; width: 1200px; height: 630px; background: #08090c; overflow: hidden; }
+.card { position: relative; width: 1200px; height: 630px; }
+svg { display: block; position: absolute; inset: 0; }
+.lockup { position: absolute; color: #ece8e1; font-family: "Instrument Serif", serif; font-weight: 400; pointer-events: none; }
+.lockup h1 { margin: 0; padding: 0; font-size: var(--title); font-weight: 400; letter-spacing: 0.05em; line-height: 1; color: #ece8e1; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+    <defs>
+      <radialGradient id="vig" cx="50%" cy="48%" r="68%">
+        <stop offset="0%" stop-color="#111318" stop-opacity="0"/>
+        <stop offset="70%" stop-color="#08090c" stop-opacity="0"/>
+        <stop offset="100%" stop-color="#08090c" stop-opacity="0.85"/>
+      </radialGradient>
+      <filter id="grain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="n"/>
+        <feColorMatrix type="saturate" values="0" in="n" result="g"/>
+        <feComponentTransfer in="g" result="a">
+          <feFuncA type="linear" slope="0.045"/>
+        </feComponentTransfer>
+      </filter>
+    </defs>
+    <rect width="1200" height="630" fill="#08090c"/>
+    <circle cx="302.35" cy="376.69" r="0.85" fill="#b9c4cc" fill-opacity="0.399"/><circle cx="76.74" cy="118.01" r="0.88" fill="#b9c4cc" fill-opacity="0.223"/><circle cx="509.96" cy="567.61" r="0.66" fill="#b9c4cc" fill-opacity="0.28"/><circle cx="325.83" cy="314.97" r="0.99" fill="#b9c4cc" fill-opacity="0.248"/><circle cx="1185.47" cy="75.53" r="0.88" fill="#b9c4cc" fill-opacity="0.21"/><circle cx="196.06" cy="202.78" r="1.15" fill="#b9c4cc" fill-opacity="0.391"/><circle cx="492.34" cy="202.57" r="0.53" fill="#b9c4cc" fill-opacity="0.206"/><circle cx="408.84" cy="441.66" r="0.69" fill="#b9c4cc" fill-opacity="0.15"/><circle cx="1040.22" cy="70.41" r="0.49" fill="#b9c4cc" fill-opacity="0.153"/><circle cx="1144.51" cy="437.4" r="0.37" fill="#b9c4cc" fill-opacity="0.339"/><circle cx="30.46" cy="268.54" r="0.78" fill="#b9c4cc" fill-opacity="0.297"/><circle cx="785.14" cy="508.7" r="0.44" fill="#b9c4cc" fill-opacity="0.129"/><circle cx="735.33" cy="72.96" r="1.15" fill="#b9c4cc" fill-opacity="0.208"/><circle cx="668.58" cy="146.95" r="1.15" fill="#b9c4cc" fill-opacity="0.268"/><circle cx="1170.75" cy="294.24" r="0.47" fill="#b9c4cc" fill-opacity="0.13"/><circle cx="777.37" cy="71.87" r="0.43" fill="#b9c4cc" fill-opacity="0.302"/><circle cx="837.46" cy="494.89" r="1.15" fill="#b9c4cc" fill-opacity="0.19"/><circle cx="1106.24" cy="50.51" r="0.47" fill="#b9c4cc" fill-opacity="0.355"/><circle cx="903.01" cy="450.72" r="0.73" fill="#b9c4cc" fill-opacity="0.263"/><circle cx="836.94" cy="196.47" r="0.57" fill="#b9c4cc" fill-opacity="0.123"/><circle cx="3.76" cy="441.41" r="0.4" fill="#b9c4cc" fill-opacity="0.361"/><circle cx="613.64" cy="592.78" r="0.88" fill="#b9c4cc" fill-opacity="0.317"/><circle cx="468.48" cy="548.25" r="0.93" fill="#b9c4cc" fill-opacity="0.117"/><circle cx="935.93" cy="336.81" r="0.97" fill="#b9c4cc" fill-opacity="0.351"/><circle cx="7.94" cy="124.59" r="0.95" fill="#b9c4cc" fill-opacity="0.33"/><circle cx="96.25" cy="367.14" r="0.69" fill="#b9c4cc" fill-opacity="0.378"/><circle cx="1037.59" cy="373.83" r="1.04" fill="#b9c4cc" fill-opacity="0.346"/><circle cx="514.26" cy="47.26" r="0.74" fill="#b9c4cc" fill-opacity="0.125"/><circle cx="207.61" cy="475.92" r="0.83" fill="#b9c4cc" fill-opacity="0.408"/><circle cx="792.98" cy="146.8" r="0.83" fill="#b9c4cc" fill-opacity="0.232"/><circle cx="209.86" cy="378.43" r="0.4" fill="#b9c4cc" fill-opacity="0.174"/><circle cx="1094.23" cy="279.22" r="1.15" fill="#b9c4cc" fill-opacity="0.405"/><circle cx="798.66" cy="414.94" r="1.15" fill="#b9c4cc" fill-opacity="0.271"/><circle cx="847.17" cy="187.88" r="1.15" fill="#b9c4cc" fill-opacity="0.33"/><circle cx="824.09" cy="504.53" r="0.47" fill="#b9c4cc" fill-opacity="0.253"/><circle cx="892.17" cy="552.94" r="1.15" fill="#b9c4cc" fill-opacity="0.21"/><circle cx="1192.8" cy="456.27" r="1.02" fill="#b9c4cc" fill-opacity="0.241"/><circle cx="211.4" cy="33.4" r="0.91" fill="#b9c4cc" fill-opacity="0.187"/><circle cx="1010.8" cy="478.01" r="0.77" fill="#b9c4cc" fill-opacity="0.168"/><circle cx="371.23" cy="398.67" r="0.55" fill="#b9c4cc" fill-opacity="0.187"/><circle cx="1065.51" cy="487.65" r="0.61" fill="#b9c4cc" fill-opacity="0.392"/><circle cx="777.82" cy="534.17" r="0.87" fill="#b9c4cc" fill-opacity="0.136"/><circle cx="309.75" cy="579.59" r="0.9" fill="#b9c4cc" fill-opacity="0.145"/><circle cx="1000.94" cy="96.44" r="0.5" fill="#b9c4cc" fill-opacity="0.406"/><circle cx="1079.46" cy="489.06" r="1.01" fill="#b9c4cc" fill-opacity="0.299"/><circle cx="320.14" cy="360.97" r="0.83" fill="#b9c4cc" fill-opacity="0.256"/><circle cx="493.17" cy="393.97" r="1.15" fill="#b9c4cc" fill-opacity="0.187"/><circle cx="879.73" cy="444.19" r="0.38" fill="#b9c4cc" fill-opacity="0.388"/><circle cx="609.62" cy="501.07" r="0.37" fill="#b9c4cc" fill-opacity="0.292"/><circle cx="1002.63" cy="61.46" r="0.8" fill="#b9c4cc" fill-opacity="0.415"/><circle cx="60.86" cy="174.53" r="0.76" fill="#b9c4cc" fill-opacity="0.153"/><circle cx="79.73" cy="442.03" r="0.6" fill="#b9c4cc" fill-opacity="0.287"/>
+    <circle cx="493.00" cy="408.00" r="214.00"
+      fill="none" stroke="#b9c4cc" stroke-opacity="0.22" stroke-width="0.9"/>
+    <circle cx="707.00" cy="408.00" r="214.00"
+      fill="none" stroke="#b9c4cc" stroke-opacity="0.22" stroke-width="0.9"/>
+    <path d="M 493.00 408.00
+             L 600.00 222.67
+             L 707.00 408.00
+             L 600.00 593.33 Z"
+      fill="none" stroke="#b9c4cc" stroke-opacity="0.16" stroke-width="0.75"/>
+    <line x1="258.00" y1="408" x2="825.51" y2="408"
+      stroke="#b9c4cc" stroke-opacity="0.42" stroke-width="1"/>
+    <circle cx="493.00" cy="408.00" r="40" fill="#ece8e1"/>
+    <circle cx="707.00" cy="408.00" r="17.5" fill="#b9c4cc"/>
+    
+        <circle cx="641.10" cy="408.00" r="5.6"
+          fill="none" stroke="#b9c4cc" stroke-width="1.35"/>
+        <circle cx="641.10" cy="408.00" r="1.35" fill="#ece8e1"/>
+        <text x="641.10" y="432.00"
+          fill="#8e8a84" font-family="Instrument Serif, serif" font-style="italic"
+          font-size="17" text-anchor="middle" dominant-baseline="middle">L1</text>
+        <circle cx="789.51" cy="408.00" r="5.6"
+          fill="none" stroke="#b9c4cc" stroke-width="1.35"/>
+        <circle cx="789.51" cy="408.00" r="1.35" fill="#ece8e1"/>
+        <text x="805.51" y="426.00"
+          fill="#8e8a84" font-family="Instrument Serif, serif" font-style="italic"
+          font-size="17" text-anchor="middle" dominant-baseline="middle">L2</text>
+        <circle cx="294.00" cy="408.00" r="5.6"
+          fill="none" stroke="#b9c4cc" stroke-width="1.35"/>
+        <circle cx="294.00" cy="408.00" r="1.35" fill="#ece8e1"/>
+        <text x="278.00" y="426.00"
+          fill="#8e8a84" font-family="Instrument Serif, serif" font-style="italic"
+          font-size="17" text-anchor="middle" dominant-baseline="middle">L3</text>
+        <circle cx="600.00" cy="222.67" r="5.6"
+          fill="none" stroke="#b9c4cc" stroke-width="1.35"/>
+        <circle cx="600.00" cy="222.67" r="1.35" fill="#ece8e1"/>
+        <text x="600.00" y="204.67"
+          fill="#8e8a84" font-family="Instrument Serif, serif" font-style="italic"
+          font-size="17" text-anchor="middle" dominant-baseline="middle">L4</text>
+        <circle cx="600.00" cy="593.33" r="5.6"
+          fill="none" stroke="#b9c4cc" stroke-width="1.35"/>
+        <circle cx="600.00" cy="593.33" r="1.35" fill="#ece8e1"/>
+        <text x="600.00" y="615.33"
+          fill="#8e8a84" font-family="Instrument Serif, serif" font-style="italic"
+          font-size="17" text-anchor="middle" dominant-baseline="middle">L5</text>
+    <rect width="1200" height="630" fill="url(#vig)"/>
+    <rect width="1200" height="630" filter="url(#grain)" style="mix-blend-mode:overlay"/>
+  </svg>
+    <div class="lockup" style="left:0; right:0; top:64px; text-align:center; --title:104px;">
+      <h1>Libration</h1>
+    </div>
+  </div></body>
+</html>

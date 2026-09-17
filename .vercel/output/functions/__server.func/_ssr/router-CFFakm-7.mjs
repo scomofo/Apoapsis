@@ -1,9 +1,9 @@
 import { i as __toESM, n as __exportAll } from "../_runtime.mjs";
 import { L as require_react, _ as useRouter, f as createRouter, g as createRootRoute, h as createFileRoute, l as Scripts, m as lazyRouteComponent, p as Outlet, u as HeadContent, v as require_jsx_runtime } from "../_libs/@tanstack/react-router+[...].mjs";
-import { r as TriangleAlert } from "../_libs/lucide-react.mjs";
+import { i as TriangleAlert } from "../_libs/lucide-react.mjs";
 import { a as union, i as string, n as number, r as object, t as literal } from "../_libs/zod.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-CoUAIkUB.js
-var router_CoUAIkUB_exports = /* @__PURE__ */ __exportAll({ getRouter: () => getRouter });
+//#region node_modules/.nitro/vite/services/ssr/assets/router-CFFakm-7.js
+var router_CFFakm_7_exports = /* @__PURE__ */ __exportAll({ getRouter: () => getRouter });
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var FALLBACK_MESSAGE = "An unexpected error occurred. Try reloading the page.";
@@ -297,8 +297,8 @@ function PreviewHostBridge() {
 	}, [router]);
 	return null;
 }
-var styles_default = "/assets/styles-CJPChZvQ.css";
-var APP_NAME = "Apoapsis";
+var styles_default = "/assets/styles-CkrVNpX4.css";
+var APP_NAME = "Libration";
 var Route$1 = createRootRoute({
 	head: () => ({
 		meta: [
@@ -310,11 +310,11 @@ var Route$1 = createRootRoute({
 			{ title: APP_NAME },
 			{
 				name: "description",
-				content: "Click-drag to fling planets and watch them orbit, slingshot, and collide."
+				content: "Investigate the five Lagrange points. Drop probes on L1–L5, watch Trojans hold, and slide the mass ratio past the Routh limit."
 			},
 			{
 				name: "theme-color",
-				content: "#07080c"
+				content: "#08090c"
 			}
 		],
 		links: [
@@ -346,7 +346,7 @@ var Route$1 = createRootRoute({
 			},
 			{
 				rel: "stylesheet",
-				href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap"
+				href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap"
 			}
 		]
 	}),
@@ -361,7 +361,7 @@ var Route$1 = createRootRoute({
 		] })]
 	})
 });
-var $$splitComponentImporter = () => import("./routes-w_Tn25j0.mjs");
+var $$splitComponentImporter = () => import("./routes-BOWB6pFu.mjs");
 var rootRouteChildren = { IndexRoute: createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter, "component") }).update({
 	id: "/",
 	path: "/",
@@ -375,4 +375,4 @@ function getRouter() {
 	});
 }
 //#endregion
-export { getRouter, router_CoUAIkUB_exports as t };
+export { getRouter, router_CFFakm_7_exports as t };

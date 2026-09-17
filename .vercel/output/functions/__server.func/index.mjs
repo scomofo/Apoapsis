@@ -12,10 +12,10 @@ var install_page_default = "<!DOCTYPE html>\n<html lang=\"en\" class=\"device-de
 //#endregion
 //#region \0virtual:grok-og-identity
 var grokOgIdentity = { "site": {
-	"title": "Apoapsis",
+	"title": "Libration",
 	"type": "x:game",
 	"card": "custom",
-	"color": "07080c",
+	"color": "08090c",
 	"image": "/og.jpg",
 	"banner": "/x-banner.jpg"
 } };

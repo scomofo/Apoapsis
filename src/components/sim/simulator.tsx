@@ -4,16 +4,22 @@ import type { EngineApi, HudSnapshot } from "@/lib/sim/types";
 import { Hud } from "./hud";
 
 const INITIAL: HudSnapshot = {
-  count: 0,
-  merges: 0,
   paused: false,
   timeScale: 1,
+  frame: "rotating",
+  potential: false,
+  hills: false,
   trails: true,
-  track: false,
   mute: false,
-  preset: "world",
-  scenario: "system",
+  system: "sun-earth",
+  mu: 3.0034e-6,
+  stable: true,
+  probeCount: 0,
+  selected: "L2",
+  selectedMission: "jwst",
+  jacobi: null,
   hint: true,
+  simDays: 0,
 };
 
 export function Simulator() {
@@ -47,7 +53,7 @@ export function Simulator() {
       <canvas
         ref={canvasRef}
         className="absolute inset-0 size-full touch-none cursor-crosshair"
-        aria-label="Gravity sandbox"
+        aria-label="Lagrange point missions"
       />
       <Hud hud={hud} engine={engine} />
     </div>

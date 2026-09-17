@@ -82,48 +82,6 @@ var createLucideIcon = (iconName, iconNode) => {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var Crosshair = createLucideIcon("crosshair", [
-	["circle", {
-		cx: "12",
-		cy: "12",
-		r: "10",
-		key: "1mglay"
-	}],
-	["line", {
-		x1: "22",
-		x2: "18",
-		y1: "12",
-		y2: "12",
-		key: "l9bcsi"
-	}],
-	["line", {
-		x1: "6",
-		x2: "2",
-		y1: "12",
-		y2: "12",
-		key: "13hhkx"
-	}],
-	["line", {
-		x1: "12",
-		x2: "12",
-		y1: "6",
-		y2: "2",
-		key: "10w3f3"
-	}],
-	["line", {
-		x1: "12",
-		x2: "12",
-		y1: "22",
-		y2: "18",
-		key: "15g9kq"
-	}]
-]);
-/**
-* @license lucide-react v0.510.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
 var Locate = createLucideIcon("locate", [
 	["line", {
 		x1: "2",
@@ -166,6 +124,16 @@ var Locate = createLucideIcon("locate", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Mountain = createLucideIcon("mountain", [["path", {
+	d: "m8 3 4 8 5-5 5 15H2L8 3z",
+	key: "otkl63"
+}]]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Pause = createLucideIcon("pause", [["rect", {
 	x: "14",
 	y: "4",
@@ -191,6 +159,47 @@ var Play = createLucideIcon("play", [["polygon", {
 	points: "6 3 20 12 6 21 6 3",
 	key: "1oa8hb"
 }]]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var RotateCcw = createLucideIcon("rotate-ccw", [["path", {
+	d: "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8",
+	key: "1357e3"
+}], ["path", {
+	d: "M3 3v5h5",
+	key: "1xhq8a"
+}]]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Shuffle = createLucideIcon("shuffle", [
+	["path", {
+		d: "m18 14 4 4-4 4",
+		key: "10pe0f"
+	}],
+	["path", {
+		d: "m18 2 4 4-4 4",
+		key: "pucp1d"
+	}],
+	["path", {
+		d: "M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22",
+		key: "1ailkh"
+	}],
+	["path", {
+		d: "M2 6h1.972a4 4 0 0 1 3.6 2.2",
+		key: "km57vx"
+	}],
+	["path", {
+		d: "M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45",
+		key: "os18l9"
+	}]
+]);
 /**
 * @license lucide-react v0.510.0 - ISC
 *
@@ -315,5 +324,25 @@ var VolumeX = createLucideIcon("volume-x", [
 		key: "5ykzw1"
 	}]
 ]);
+/**
+* @license lucide-react v0.510.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
+var Waves = createLucideIcon("waves", [
+	["path", {
+		d: "M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
+		key: "knzxuh"
+	}],
+	["path", {
+		d: "M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
+		key: "2jd2cc"
+	}],
+	["path", {
+		d: "M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1",
+		key: "rd2r6e"
+	}]
+]);
 //#endregion
-export { Spline as a, Locate as c, Trash2 as i, Crosshair as l, Volume2 as n, Play as o, TriangleAlert as r, Pause as s, VolumeX as t };
+export { Trash2 as a, RotateCcw as c, Mountain as d, Locate as f, TriangleAlert as i, Play as l, VolumeX as n, Spline as o, Volume2 as r, Shuffle as s, Waves as t, Pause as u };

@@ -1,20 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #07080c;
-  --color-surface: #12141a;
-  --color-elevated: #1a1d24;
-  --color-fg: #eceef2;
-  --color-muted: #8c9098;
-  --color-accent: #b7bdc8;
+  --color-bg: #08090c;
+  --color-surface: #111318;
+  --color-elevated: #181b21;
+  --color-fg: #ece8e1;
+  --color-muted: #8e8a84;
+  --color-accent: #b9c4cc;
   --color-border: color-mix(in oklab, var(--color-fg) 12%, transparent);
   --color-border-strong: color-mix(in oklab, var(--color-fg) 22%, transparent);
-  --color-mass-dust: #c4b7a4;
-  --color-mass-moon: #9aa6b4;
-  --color-mass-world: #6f93a8;
-  --color-mass-giant: #c4a07a;
-  --color-mass-star: #ead4a2;
-  --color-mass-well: #141416;
 
   --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-display: "Instrument Serif", "Times New Roman", serif;
