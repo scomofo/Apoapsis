@@ -111,9 +111,19 @@ it with the same priority as this file.
 
 - **`/workspace`** is the project root; Linux container, **Node 22**.
 - The app **must listen on `0.0.0.0:8080`** — the preview proxy prefers a server
-  bound on all interfaces. Don't bind loopback-only; don't pick another port.
+  bound on all interfaces. Don't bind loopback-only; don't pick another port
+  (**non-negotiable in the Grok sandbox**; on the owner's own machine local
+  dev follows the port map — this repo runs on **8087**, see the port-map note
+  below).
 - The sandbox may be stopped or replaced; **`/workspace/startup.sh`** is the
   restart contract you own.
+
+> **Port-map note.** Everything in this file about port `8080` is the **Grok
+> hosted-sandbox contract**: in Grok's sandbox the preview proxy
+> auto-discovers whatever you serve on `0.0.0.0:8080` — platform behavior,
+> unchanged. On the owner's own machine this repo's dev server runs on **8087**
+> per the port map; the `dev` script's `--port` flag overrides `vite.config`'s
+> `server.port` locally.
 
 ### `/workspace/startup.sh` (required — you maintain this)
 

@@ -38,3 +38,9 @@ config:
 If you edit it, preserve both port contracts, the build/preview-gated nitro
 plugin **including its `serverDir: "./server"` option** (without it the deployed
 app loses the Home Screen install page), and `grokPwaPlugin()`.
+
+> **Port-map note.** The dev-port `0.0.0.0:8080` binding and the single-port-8080
+> live preview above are the **Grok hosted-sandbox contract** — platform
+> behavior, unchanged. On the owner's own machine this repo's dev server runs
+> on **8087** per the port map; the `dev` script's `--port` flag overrides
+> `vite.config`'s `server.port` locally.
