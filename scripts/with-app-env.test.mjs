@@ -11,6 +11,7 @@ import {
   parseAppEnv,
   projectRoot,
   readAppEnv,
+  spawnOptions,
 } from "./with-app-env.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -111,6 +112,16 @@ test("a signal-killed command is never reported as success", async () => {
     ]),
     (err) => err.signal === "SIGTERM" || err.code !== 0,
   );
+});
+
+test("bare commands run through a shell on Windows only", () => {
+  // On win32 `vite`/`npm` are `.cmd` shims that spawn() cannot run without a
+  // shell (`spawn vite ENOENT`); on POSIX a shell would change quoting for
+  // no reason. process.platform is read-only, so assert the options follow
+  // the platform — a regression here is removing the win32 scoping.
+  const opts = spawnOptions();
+  assert.equal(opts.shell, process.platform === "win32");
+  assert.equal(opts.stdio, "inherit");
 });
 
 test("the CLI still runs when invoked through a symlinked path", async () => {

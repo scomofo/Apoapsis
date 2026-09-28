@@ -301,6 +301,9 @@ async function restart() {
     cwd: ROOT,
     detached: true,
     stdio: ["ignore", log, log],
+    // Bare `npm` is a `.cmd` shim on Windows: spawn it through a shell there
+    // so the restart path works on win32. False everywhere else.
+    shell: process.platform === "win32",
   });
   child.unref();
   writeFileSync(PID_FILE, `${child.pid}\n`);
