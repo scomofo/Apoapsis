@@ -104,6 +104,20 @@ export function isMainModule(moduleUrl) {
   }
 }
 
+/**
+ * Spawn options for the wrapped command.
+ *
+ * On Windows, bare commands like `vite` and `npm` are `.cmd` shims, which
+ * `child_process.spawn` cannot execute without a shell — a direct spawn fails
+ * with `spawn vite ENOENT`. The shell is scoped to win32 only: on POSIX a
+ * shell is unnecessary and would needlessly change argument quoting. Bare
+ * commands only — absolute paths still work because the call sites never
+ * pass a path containing a drive letter or directory separator here.
+ */
+export function spawnOptions() {
+  return { stdio: "inherit", shell: process.platform === "win32" };
+}
+
 function main(argv) {
   const [command, ...args] = argv;
   if (!command) {
@@ -111,7 +125,7 @@ function main(argv) {
     process.exit(2);
   }
   const env = mergeAppEnv(readAppEnv(projectRoot()), process.env);
-  const child = spawn(command, args, { stdio: "inherit", env });
+  const child = spawn(command, args, { ...spawnOptions(), env });
   // The dev server is long-running and is stopped by signalling this wrapper.
   for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
     process.on(signal, () => child.kill(signal));
