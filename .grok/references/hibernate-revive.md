@@ -17,6 +17,11 @@ This is the surrounding lifecycle behaviour.
 A revive with no `startup.sh` leaves nothing listening on `:8080`, so the user
 sees an empty preview pane.
 
+> **Port-map note.** `:8080` here is the **Grok hosted-sandbox contract** —
+> platform behavior, unchanged. On the owner's own machine this repo's dev
+> server runs on **8087** per the port map; the `dev` script's `--port` flag
+> overrides `vite.config`'s `server.port` locally.
+
 ## A `startup.sh` that satisfies the rules
 
 ```sh

@@ -209,6 +209,11 @@ Wire `window.__controlsTest` from the game loop when `import.meta.env.DEV` or a
 
 ### 5c. Automated smoke (run it)
 
+> **Port-map note.** `127.0.0.1:8080` below is the **Grok hosted sandbox**, where
+> the preview proxy auto-discovers `0.0.0.0:8080` — platform behavior, unchanged.
+> On the owner's own machine this repo's dev server runs on **8087** per the
+> port map; run the smoke against `127.0.0.1:8087` there.
+
 Drive the §5b probe with the preinstalled **`agent-browser`** CLI — that is the
 first move, not a hand-written script. **A thrown `eval` exits non-zero; a
 merely falsy one does not**, so assert by throwing. Run it as one `batch` — one

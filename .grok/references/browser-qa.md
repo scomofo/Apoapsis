@@ -3,6 +3,12 @@
 `AGENTS.md` § "Execution loop" states the mandatory pass. This is the menu of
 capabilities and the depth judgment around it.
 
+> **Port-map note.** `127.0.0.1:8080` below is the **Grok hosted sandbox**, where
+> the preview proxy auto-discovers `0.0.0.0:8080` — platform behavior, unchanged.
+> On the owner's own machine this repo's dev server runs on **8087** per the
+> port map; point QA there at `127.0.0.1:8087` instead (the `dev` script's
+> `--port` flag overrides `vite.config`'s `server.port` locally).
+
 Everything here runs **in the sandbox** against `http://127.0.0.1:8080` — it is
 **not** the user's Grok chat tab. Use whatever browser capability you have
 **yourself**, so quality beats curl-only.

@@ -85,7 +85,7 @@ function authPopupPlugin(): Plugin {
           }
 
           const host = String(
-            req.headers["x-forwarded-host"] ?? req.headers.host ?? "localhost:8080",
+            req.headers["x-forwarded-host"] ?? req.headers.host ?? "localhost:8087",
           );
           const proto = String(
             req.headers["x-forwarded-proto"] ??
@@ -142,13 +142,15 @@ function authPopupPlugin(): Plugin {
   };
 }
 
-// `0.0.0.0:8080` is the live-preview contract — don't change host/port.
+// `0.0.0.0:8080` is the Grok sandbox live-preview contract — don't change
+// host/port for the sandbox. Local dev port comes from the `dev` script's
+// `--port` flag (port map), which overrides server.port below.
 // The dev server starts once `src/router.tsx` and `src/routes/` exist — see
 // AGENTS.md § "First scaffold".
 export default defineConfig(({ command, isPreview }) => ({
   server: {
     host: "0.0.0.0",
-    port: 8080,
+    port: 8087,
     strictPort: true,
   },
   preview: {

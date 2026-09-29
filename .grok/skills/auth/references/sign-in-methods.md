@@ -35,6 +35,12 @@ Use **only** these three — no other method is supported:
   `127.0.0.1` / `[::1]`). Open the app at one of those origins (not a random
   host/port).
 
+  **Port-map note:** the port-8080 loopback origin above is the **Grok
+  hosted-sandbox contract** — platform behavior, unchanged. On the owner's own
+  machine this repo's local dev server runs on **8087** per the port map (the
+  `trustedOrigins` were updated accordingly); open it there at
+  `localhost:8087` / `127.0.0.1:8087`.
+
 Do **NOT** add or use anything else: no other social / OAuth providers (GitHub,
 Apple, Discord, Microsoft, Facebook, …), and no magic links, passkeys, one-time
 codes / OTP, phone / SMS, or anonymous sign-in.
