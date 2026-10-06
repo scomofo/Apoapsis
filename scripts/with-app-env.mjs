@@ -118,8 +118,21 @@ export function spawnOptions() {
   return { stdio: "inherit", shell: process.platform === "win32" };
 }
 
+
+// package.json dev scripts use POSIX-shell ${PORT:-NNNN} defaults, which
+// cmd.exe passes through literally on Windows. Expand it here (the
+// cross-platform choke point) instead: where a real shell already expanded
+// it, or no such pattern is present, this is a no-op.
+function expandPortDefault(arg) {
+  const m = /^\$\{PORT:-(\d+)\}$/.exec(arg);
+  if (!m) return arg;
+  const envPort = (process.env.PORT || "").trim();
+  return /^\d+$/.test(envPort) ? envPort : m[1];
+}
+
 function main(argv) {
-  const [command, ...args] = argv;
+  const [command, ...rawArgs] = argv;
+  const args = rawArgs.map(expandPortDefault);
   if (!command) {
     console.error("usage: node scripts/with-app-env.mjs <command> [args…]");
     process.exit(2);
