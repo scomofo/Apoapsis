@@ -13,8 +13,8 @@ Port selection is shared by startup and direct `npm run dev`:
    fails clearly; it never silently moves to another port.
 2. Without an override, reuse a healthy saved server belonging to this project,
    then a healthy project server on the preferred port.
-3. Otherwise, scan TCP availability from the preferred port through preferred
-   - 50. Non-HTTP listeners also count as occupied.
+3. Otherwise, scan TCP availability from the preferred port through 50 ports
+   above it. Non-HTTP listeners also count as occupied.
 
 The dev-only identity endpoint verifies a token tied to the real repository
 path. A generic HTTP 200 or stale PID is insufficient for reuse. Runtime state

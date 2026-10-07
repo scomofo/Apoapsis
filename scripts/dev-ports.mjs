@@ -66,7 +66,7 @@ export async function ownsDevServer(port, identity) {
 }
 
 // Windows can bind a wildcard socket beside a loopback listener. Check a
-// real TCP connection first; then bind to detect other interface owners.
+// real TCP connection first; then bind to check availability on other interfaces.
 // Vite is started with --strictPort, so a later bind race fails rather than
 // silently serving somewhere other than the persisted port.
 export async function portAvailable(port) {
