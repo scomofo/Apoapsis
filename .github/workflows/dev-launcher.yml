@@ -1,0 +1,40 @@
+name: Dev launcher
+
+on:
+  pull_request:
+    paths:
+      - "startup.sh"
+      - "package.json"
+      - "scripts/**"
+      - ".github/workflows/dev-launcher.yml"
+  push:
+    branches: [main]
+    paths:
+      - "startup.sh"
+      - "package.json"
+      - "scripts/**"
+      - ".github/workflows/dev-launcher.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  launcher:
+    name: Launcher (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      # Node-only fixtures exercise npm and real .cmd shims without app dependencies.
+      - run: node --test --test-reporter=spec scripts/dev-ports.test.mjs scripts/dev-launch.test.mjs
+      - if: runner.os == 'Linux'
+        run: node --test --test-reporter=spec scripts/preview-project.test.mjs scripts/preview.test.mjs scripts/local-processes.test.mjs

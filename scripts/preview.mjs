@@ -1,14 +1,11 @@
 #!/usr/bin/env node
 /**
- * Owns :8081, the built-output QA preview.
- *
- * `vite preview` is strictPort, so a preview left over from an earlier turn
- * both fails the next start and keeps serving the previous build's output.
- * Every restart therefore kills the current port owner first, whoever started
- * it. Owners come from /proc, so this runs only inside the Linux sandbox.
- *
- *   node scripts/preview.mjs stop|restart
+ * Restarts only this project's built-output QA preview on port 8081.
+ * Ownership is corroborated before any signal; other apps are never stopped.
+ * This helper remains Linux-only. Development startup is cross-platform.
  */
+import { localPid, namespaceId, procDirectory, projectProcess } from "./local-processes.mjs";
+import { portAvailable } from "./dev-ports.mjs";
 import { spawn } from "node:child_process";
 import {
   existsSync,
@@ -90,21 +87,12 @@ export function looksLikePreviewProcess(cmdline) {
   return /\brun\s+preview(?:\s|$)/.test(argv) || /\bvite\b\s+preview\b/.test(argv);
 }
 
-/**
- * Pids to signal. Port owners are owners by definition; the pidfile pid is only
- * a claim left by an earlier run — pids are re-used across hibernate/revive, so
- * signal it only when its command line still looks like the preview.
- */
-export function previewOwners({ portPids, pidFilePid, cmdlineOf }) {
-  const owners = new Set(portPids);
-  if (
-    pidFilePid !== null &&
-    !owners.has(pidFilePid) &&
-    looksLikePreviewProcess(cmdlineOf(pidFilePid))
-  ) {
-    owners.add(pidFilePid);
-  }
-  return [...owners];
+/** Corroborate both project directory and command before signalling. */
+export function previewOwners({ portPids, pidFilePid, cmdlineOf, belongsToProject }) {
+  const candidates = new Set([...portPids, ...(pidFilePid === null ? [] : [pidFilePid])]);
+  return [...candidates].filter(
+    (pid) => belongsToProject(pid) && looksLikePreviewProcess(cmdlineOf(pid)),
+  );
 }
 
 async function waitForExit(pids, { isAlive, sleep, timeoutMs, pollMs }) {
@@ -141,18 +129,12 @@ export async function terminatePids(
 export function stopOutcome({ signalled, stubborn, after }) {
   const held = [...new Set([...stubborn, ...after.pids])];
   if (held.length > 0) {
-    return { ok: false, error: `port ${PREVIEW_PORT} is still held by pid(s) ${held.join(", ")}` };
-  }
-  if (after.unattributed) {
-    return {
-      ok: false,
-      error: `port ${PREVIEW_PORT} is held by a process this script cannot see`,
-    };
+    return { ok: false, error: `preview is still held by pid(s) ${held.join(", ")}` };
   }
   const message =
     signalled.length > 0
-      ? `stopped pid(s) ${signalled.join(", ")} — port ${PREVIEW_PORT} is free`
-      : `nothing was listening on ${PREVIEW_PORT}`;
+      ? `stopped this project's preview pid(s) ${signalled.join(", ")}`
+      : "no preview owned by this project was running";
   return { ok: true, message };
 }
 
@@ -160,6 +142,8 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function isAlive(pid) {
   try {
+    const dir = procDirectory(pid);
+    if (dir && /^State:\s+Z/m.test(readFileSync(`${dir}/status`, "utf8"))) return false;
     process.kill(pid, 0);
     return true;
   } catch (err) {
@@ -169,7 +153,8 @@ function isAlive(pid) {
 
 function pgidOf(pid) {
   try {
-    return parsePgid(readFileSync(`/proc/${pid}/stat`, "utf8"));
+    const dir = procDirectory(pid);
+    return dir ? namespaceId(readFileSync(`${dir}/status`, "utf8"), "NSpgid") : null;
   } catch {
     return null;
   }
@@ -196,7 +181,8 @@ function killPid(pid, signal) {
 
 function cmdlineOf(pid) {
   try {
-    return readFileSync(`/proc/${pid}/cmdline`, "utf8");
+    const dir = procDirectory(pid);
+    return dir ? readFileSync(`${dir}/cmdline`, "utf8") : "";
   } catch {
     // Usually a dead pid — the stale pidfile this corroboration exists for.
     return "";
@@ -215,18 +201,18 @@ function pidsForSocketInodes(inodes) {
   const targets = new Set([...inodes].map((inode) => `socket:[${inode}]`));
   const pids = [];
   for (const entry of readdirSync("/proc")) {
-    const pid = parsePid(entry);
-    if (pid === null || pid === process.pid) continue;
+    const pid = localPid(entry);
+    if (pid === null || pid <= 1 || pid === process.pid) continue;
     let fds;
     try {
-      fds = readdirSync(`/proc/${pid}/fd`);
+      fds = readdirSync(`/proc/${entry}/fd`);
     } catch {
       // Exited mid-scan, or owned by another user.
       continue;
     }
     for (const fd of fds) {
       try {
-        if (targets.has(readlinkSync(`/proc/${pid}/fd/${fd}`))) {
+        if (targets.has(readlinkSync(`/proc/${entry}/fd/${fd}`))) {
           pids.push(pid);
           break;
         }
@@ -263,10 +249,17 @@ async function stop(announce = true) {
     portPids: portOwners().pids,
     pidFilePid: readPidFile(),
     cmdlineOf,
+    belongsToProject: (pid) => projectProcess(pid, ROOT, () => true),
   });
   const { signalled, stubborn } = await terminatePids(owners, { kill: killPid, isAlive, sleep });
 
-  const outcome = stopOutcome({ signalled, stubborn, after: portOwners() });
+  const remaining = previewOwners({
+    portPids: portOwners().pids,
+    pidFilePid: readPidFile(),
+    cmdlineOf,
+    belongsToProject: (pid) => projectProcess(pid, ROOT, () => true),
+  });
+  const outcome = stopOutcome({ signalled, stubborn, after: { pids: remaining } });
   if (!outcome.ok) {
     // Keep the pidfile: a survivor the port scan cannot attribute leaves it as
     // the only record a retry could use.
@@ -294,6 +287,12 @@ async function waitForReady(failure) {
 
 async function restart() {
   if (!(await stop())) return 1;
+  if (!(await portAvailable(PREVIEW_PORT))) {
+    console.error(
+      `[preview] port ${PREVIEW_PORT} is held by another process; leaving it untouched`,
+    );
+    return 1;
+  }
 
   mkdirSync(dirname(LOG_FILE), { recursive: true });
   const log = openSync(LOG_FILE, "a");
