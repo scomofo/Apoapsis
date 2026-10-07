@@ -1,3 +1,5 @@
+import { installDevIdentity } from "./dev-identity.mjs";
+
 /**
  * Dev-only `/__app-env` endpoint: the client env the running Vite server
  * resolved, as JSON.
@@ -16,6 +18,7 @@ export function appEnvPlugin() {
     name: "app-builder:app-env",
     apply: "serve",
     configureServer(server) {
+      installDevIdentity(server);
       server.middlewares.use((req, res, next) => {
         const pathOnly = (req.url ?? "").split("?", 1)[0];
         if (pathOnly !== APP_ENV_ROUTE || (req.method ?? "GET").toUpperCase() !== "GET") {

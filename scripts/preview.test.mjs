@@ -121,26 +121,29 @@ test("looksLikePreviewProcess spares the sibling scripts and re-used pids", () =
   assert.equal(looksLikePreviewProcess(""), false);
 });
 
-test("previewOwners trusts port owners and dedupes the pidfile pid", () => {
+test("previewOwners corroborates project previews and dedupes the pidfile pid", () => {
   const owners = previewOwners({
+    belongsToProject: () => true,
     portPids: [50, 51],
     pidFilePid: 50,
-    cmdlineOf: () => assert.fail("a port owner needs no corroboration"),
+    cmdlineOf: () => cmdline("vite", "preview"),
   });
   assert.deepEqual(owners, [50, 51]);
 });
 
 test("previewOwners adds a pidfile pid whose command line is still the preview", () => {
   const owners = previewOwners({
+    belongsToProject: () => true,
     portPids: [51],
     pidFilePid: 50,
-    cmdlineOf: (pid) => (pid === 50 ? cmdline("node", "npm-cli.js", "run", "preview") : ""),
+    cmdlineOf: () => cmdline("node", "npm-cli.js", "run", "preview"),
   });
   assert.deepEqual(owners, [51, 50]);
 });
 
 test("previewOwners drops a stale pidfile pid re-used by another process", () => {
   const owners = previewOwners({
+    belongsToProject: () => true,
     portPids: [],
     pidFilePid: 50,
     cmdlineOf: () => cmdline("sleep", "300"),
@@ -149,12 +152,22 @@ test("previewOwners drops a stale pidfile pid re-used by another process", () =>
 });
 
 test("previewOwners drops a pidfile pid that no longer exists", () => {
-  const owners = previewOwners({ portPids: [], pidFilePid: 50, cmdlineOf: () => "" });
+  const owners = previewOwners({
+    belongsToProject: () => true,
+    portPids: [],
+    pidFilePid: 50,
+    cmdlineOf: () => "",
+  });
   assert.deepEqual(owners, []);
 });
 
 test("previewOwners on a free port with no pidfile signals nothing", () => {
-  const owners = previewOwners({ portPids: [], pidFilePid: null, cmdlineOf: () => "" });
+  const owners = previewOwners({
+    belongsToProject: () => true,
+    portPids: [],
+    pidFilePid: null,
+    cmdlineOf: () => "",
+  });
   assert.deepEqual(owners, []);
 });
 
@@ -176,28 +189,27 @@ test("stopOutcome fails when a pid survives or the port is still held", () => {
   assert.match(newOwner.error, /still held by pid\(s\) 77/);
 });
 
-test("stopOutcome reports a verified free port", () => {
+test("stopOutcome reports only this project’s preview status", () => {
   const stopped = stopOutcome({
     signalled: [50],
     stubborn: [],
     after: { pids: [] },
   });
   assert.equal(stopped.ok, true);
-  assert.match(stopped.message, /stopped pid\(s\) 50 — port 8081 is free/);
+  assert.match(stopped.message, /stopped this project's preview pid\(s\) 50/);
 
   const idle = stopOutcome({ signalled: [], stubborn: [], after: { pids: [] } });
   assert.equal(idle.ok, true);
-  assert.match(idle.message, /nothing was listening on 8081/);
+  assert.match(idle.message, /no preview owned by this project was running/);
 });
 
-test("stopOutcome fails on a listener whose owner cannot be attributed", () => {
+test("stopOutcome allows unrelated or unattributed listeners", () => {
   const outcome = stopOutcome({
     signalled: [],
     stubborn: [],
     after: { pids: [], unattributed: true },
   });
-  assert.equal(outcome.ok, false);
-  assert.match(outcome.error, /port 8081 is held by a process this script cannot see/);
+  assert.equal(outcome.ok, true);
 });
 
 function fakeProcesses({ pids, ignoresTerm = [] }) {
@@ -254,4 +266,14 @@ test("terminatePids on a free port signals nothing", async () => {
   const result = await terminatePids([], fake);
   assert.deepEqual(result, { signalled: [], killed: [], stubborn: [] });
   assert.deepEqual(fake.signals, []);
+});
+
+test("previewOwners spares other projects even when they own the requested port or pidfile", () => {
+  const owners = previewOwners({
+    portPids: [50, 51, 52],
+    pidFilePid: 53,
+    belongsToProject: (pid) => pid === 51 || pid === 52,
+    cmdlineOf: (pid) => (pid === 52 ? "node unrelated-server.mjs" : "vite preview"),
+  });
+  assert.deepEqual(owners, [51]);
 });
