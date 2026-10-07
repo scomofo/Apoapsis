@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs";
-import { createServer } from "node:net";
+import { createConnection, createServer } from "node:net";
 import { join } from "node:path";
 
 export const DEFAULT_DEV_PORT = 8087;
@@ -65,10 +65,29 @@ export async function ownsDevServer(port, identity) {
   }
 }
 
-// Binding a TCP socket also detects non-HTTP listeners and loopback-only owners.
+// Windows can bind a wildcard socket beside a loopback listener. Check a
+// real TCP connection first; then bind to detect other interface owners.
 // Vite is started with --strictPort, so a later bind race fails rather than
 // silently serving somewhere other than the persisted port.
-export function portAvailable(port) {
+export async function portAvailable(port) {
+  const listening = await new Promise((resolve, reject) => {
+    const socket = createConnection({ port, host: "127.0.0.1" });
+    const finish = (value) => {
+      socket.destroy();
+      resolve(value);
+    };
+    socket.once("connect", () => finish(true));
+    socket.setTimeout(400, () => finish(true));
+    socket.once("error", (error) => {
+      if (error.code === "ECONNREFUSED") finish(false);
+      else if (error.code === "EACCES") finish(true);
+      else {
+        socket.destroy();
+        reject(error);
+      }
+    });
+  });
+  if (listening) return false;
   return new Promise((resolve, reject) => {
     const probe = createServer();
     probe.once("error", (error) => {
